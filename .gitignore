@@ -1,0 +1,8 @@
+.vs/
+Library/
+obj/
+Packages/
+ProjectSettings/
+VR RPG.sln
+Assembly-CSharp.csproj
+*.sln
