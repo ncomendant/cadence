@@ -5,6 +5,7 @@ using UnityEngine;
 public class Block : MonoBehaviour {
 
     public int speed;
+    public BlockType type;
 
 	// Use this for initialization
 	void Start () {
@@ -18,7 +19,7 @@ public class Block : MonoBehaviour {
 
     public void Init(int typeIndex)
     {
-        BlockType type = BlockType.VALUES[typeIndex];
+        type = BlockType.VALUES[typeIndex];
         transform.Translate(0f, 0f, type.position);
         GetComponentInChildren<TextMesh>().text = type.text;
     }
