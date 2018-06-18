@@ -3,6 +3,8 @@ Library/
 obj/
 Packages/
 ProjectSettings/
+Temp/
 VR RPG.sln
 Assembly-CSharp.csproj
 *.sln
+*.meta
