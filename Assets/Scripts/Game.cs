@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Game : MonoBehaviour {
-    public float linePosition = -9f;
-    public float triggerRange = 0.5f;
-    public float blockInterval;
 
-    private float blockCooldown;
-    private List<Block> blocks;
+    public float startTime;
+
+    public int playerStartingHealth;
+    public int enemyStartingHealth;
+
+    private float projectileFrequency;
+
+
+    private int playerHealth;
+    private int enemyHealth;
+    
 
     private EventManager eventManager;
+    private float projectileCooldown;
 
     private void Awake()
     {
@@ -20,15 +27,27 @@ public class Game : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        blockCooldown = 0f;
-        blocks = new List<Block>();
-	}
-   
+        On(Events.GOOD_HIT, new GoodHitHandler(this));
+        On(Events.BAD_HIT, new BadHitHandler(this));
+        On(Events.MISS, new BadHitHandler(this));
+        
+        playerHealth = playerStartingHealth;
+        enemyHealth = enemyStartingHealth;
+
+        projectileCooldown = startTime;
+
+        projectileFrequency = 1.1f - (float)Settings.difficulty;
+    }   
 	
 	// Update is called once per frame
 	void Update () {
-        CheckInput();
-        UpdateBlocks(Time.deltaTime);
+        projectileCooldown -= Time.deltaTime;
+        if (projectileCooldown <= 0f)
+        {
+            string resourceName = (Random.value < 0.5f) ? "Block" : "Orb";
+            Instantiate(Resources.Load(resourceName));
+            projectileCooldown = projectileFrequency;
+        }
 	}
 
     public void On(string eventName, EventHandler handler)
@@ -41,74 +60,62 @@ public class Game : MonoBehaviour {
         eventManager.Emit(eventName, data);
     }
 
-    private void CheckInput()
+    private sealed class GoodHitHandler : EventHandler
     {
-        for (int i = blocks.Count-1; i >= 0; i--) {
-            Block block = blocks[i];
-            float distance = Mathf.Abs(block.transform.position.x - linePosition);
+        private Game game;
+        private GameObject enemyHealthBar;
+        private readonly float startingScale;
 
-            if (distance <= triggerRange && Input.GetKeyDown(block.type.keyCode))
+        public GoodHitHandler(Game game)
+        {
+            this.game = game;
+            enemyHealthBar = GameObject.Find("Enemy Health Bar");
+            startingScale = enemyHealthBar.transform.localScale.x;
+        }
+
+        public void OnEvent(params object[] data)
+        {
+            game.enemyHealth--;
+
+            float percent = (float)game.enemyHealth / (float)game.enemyStartingHealth;
+            if (percent < 0f) percent = 0f;
+
+            Vector3 scale = enemyHealthBar.transform.localScale;
+            scale.x = percent * startingScale;
+            enemyHealthBar.transform.localScale = scale;
+
+            if (percent == 0f)
             {
-                if (distance <= triggerRange * 0.25)
-                {
-                    MakeFeedbackText(BlockRating.PERFECT, block.type.position);
-                    Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.PERFECT);
-                }
-                else if (distance <= triggerRange * 0.75)
-                {
-                    MakeFeedbackText(BlockRating.GOOD, block.type.position);
-                    Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.GOOD);
-                }
-                else
-                {
-                    MakeFeedbackText(BlockRating.BAD, block.type.position);
-                    Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.BAD);
-                }
-                blocks.RemoveAt(i);
-                Destroy(block.gameObject);
+                print("You win!");
             }
         }
     }
 
-    private void UpdateBlocks(float passedTime)
+    private sealed class BadHitHandler : EventHandler
     {
-        blockCooldown -= Time.deltaTime;
-        if (blockCooldown <= 0f)
-        {
-            MakeRandomBlock();
-            blockCooldown = blockInterval;
-        }
-        RemovePassedBlocks();
-    }
+        private Game game;
+        private GameObject playerHealthBar;
+        private readonly float startingScale;
 
-    private void RemovePassedBlocks()
-    {
-        for (int i = blocks.Count-1; i >= 0; i--)
+        public BadHitHandler(Game game)
         {
-            Block block = blocks[i];
-            if (block.transform.position.x <= linePosition-triggerRange)
+            this.game = game;
+            playerHealthBar = GameObject.Find("Player Health Bar");
+            startingScale = playerHealthBar.transform.localScale.z;
+        }
+
+        public void OnEvent(params object[] data)
+        {
+            game.playerHealth--;
+            float percent = (float)game.playerHealth / (float)game.playerStartingHealth;
+            if (percent < 0f) percent = 0f;
+            Vector3 scale = playerHealthBar.transform.localScale;
+            scale.z = percent * startingScale;
+            playerHealthBar.transform.localScale = scale;
+            if (percent == 0f)
             {
-                MakeFeedbackText(BlockRating.MISS, block.type.position);
-                Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.MISS);
-                blocks.RemoveAt(i);
-                Destroy(block.gameObject);
+                print("You lose!");
             }
         }
-    }
-
-    private void MakeFeedbackText(BlockRating rating, float position)
-    {
-        GameObject textObj = (GameObject)Instantiate(Resources.Load("Feedback Label"));
-        FeedbackText text = textObj.GetComponent<FeedbackText>();
-        text.Init(rating, position);
-    }
-
-    private void MakeRandomBlock()
-    {
-        int index = Random.Range(0, 8);
-        GameObject blockObj = (GameObject)Instantiate(Resources.Load("Block"));
-        Block block = blockObj.GetComponent<Block>();
-        blocks.Add(block);
-        block.Init(index);
     }
 }

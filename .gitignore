@@ -4,7 +4,10 @@ obj/
 Packages/
 ProjectSettings/
 Temp/
+Assets/Standard Assets/
+Assets/SteamVR
+Assets/FantasyMonster/
 VR RPG.sln
-Assembly-CSharp.csproj
+Assembly-CSharp*.*
 *.sln
 *.meta
