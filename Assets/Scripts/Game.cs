@@ -10,18 +10,36 @@ public class Game : MonoBehaviour {
     private float blockCooldown;
     private List<Block> blocks;
 
+    private EventManager eventManager;
 
-	// Use this for initialization
-	void Start () {
+    private void Awake()
+    {
+        eventManager = new EventManager();
+    }
+
+
+    // Use this for initialization
+    void Start () {
         blockCooldown = 0f;
         blocks = new List<Block>();
 	}
+   
 	
 	// Update is called once per frame
 	void Update () {
         CheckInput();
         UpdateBlocks(Time.deltaTime);
 	}
+
+    public void On(string eventName, EventHandler handler)
+    {
+        eventManager.On(eventName, handler);
+    }
+
+    public void Emit(string eventName, params object[] data)
+    {
+        eventManager.Emit(eventName, data);
+    }
 
     private void CheckInput()
     {
@@ -31,9 +49,21 @@ public class Game : MonoBehaviour {
 
             if (distance <= triggerRange && Input.GetKeyDown(block.type.keyCode))
             {
-                if (distance <= triggerRange * 0.25) MakeFeedbackText(BlockRating.PERFECT, block.type.position);
-                else if (distance <= triggerRange * 0.75) MakeFeedbackText(BlockRating.GOOD, block.type.position);
-                else MakeFeedbackText(BlockRating.BAD, block.type.position);
+                if (distance <= triggerRange * 0.25)
+                {
+                    MakeFeedbackText(BlockRating.PERFECT, block.type.position);
+                    Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.PERFECT);
+                }
+                else if (distance <= triggerRange * 0.75)
+                {
+                    MakeFeedbackText(BlockRating.GOOD, block.type.position);
+                    Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.GOOD);
+                }
+                else
+                {
+                    MakeFeedbackText(BlockRating.BAD, block.type.position);
+                    Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.BAD);
+                }
                 blocks.RemoveAt(i);
                 Destroy(block.gameObject);
             }
@@ -59,6 +89,7 @@ public class Game : MonoBehaviour {
             if (block.transform.position.x <= linePosition-triggerRange)
             {
                 MakeFeedbackText(BlockRating.MISS, block.type.position);
+                Emit(Event.BLOCK_DESPAWNED, block.type, BlockRating.MISS);
                 blocks.RemoveAt(i);
                 Destroy(block.gameObject);
             }
