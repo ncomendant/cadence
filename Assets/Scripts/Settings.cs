@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class Settings {
     public static float difficulty = 0.5f;
+    public static bool vrEnabled = false;
     private Settings(){}
 }

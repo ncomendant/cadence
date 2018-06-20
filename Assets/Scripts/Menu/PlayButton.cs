@@ -12,7 +12,7 @@ public class PlayButton : MonoBehaviour {
     // Use this for initialization
     void Start () {
         menu = GameObject.Find("Main").GetComponent<Menu>();
-        menu.On(MenuEvent.TRIGGER_CLICKED, new TriggerClickedHandler(this));
+        menu.On(MenuEvent.PRIMARY_CLICKED, new ClickedHandler(this));
     }
 	
 	// Update is called once per frame
@@ -30,20 +30,30 @@ public class PlayButton : MonoBehaviour {
         selected = false;
     }
 
-    private sealed class TriggerClickedHandler : EventHandler
+    private sealed class ClickedHandler : EventHandler
     {
         private PlayButton playButton;
 
-        public TriggerClickedHandler(PlayButton playButton)
+        public ClickedHandler(PlayButton playButton)
         {
             this.playButton = playButton;
         }
 
         public void OnEvent(params object[] data)
         {
-            if (playButton.selected)
+            if (Settings.vrEnabled)
             {
-                SceneManager.LoadScene("Battle");
+                if (playButton.selected)
+                {
+                    SceneManager.LoadScene("Battle");
+                }
+            } else
+            {
+                GameObject hoveredObject = (GameObject)data[0];
+                if (hoveredObject == this.playButton.gameObject)
+                {
+                    SceneManager.LoadScene("Battle");
+                }
             }
         }
     }

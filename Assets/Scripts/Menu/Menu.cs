@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class Menu : MonoBehaviour {
 
@@ -11,30 +12,39 @@ public class Menu : MonoBehaviour {
 
     private void Awake()
     {
-        eventManager = new EventManager();
-        GameObject rig = GameObject.Find("[CameraRig]");
-        controller = rig.transform.Find("Controller (right)").GetComponent<SteamVR_TrackedController>();
+        eventManager = GetComponent<EventManager>();
+
+        Settings.vrEnabled = XRDevice.isPresent && XRDevice.model == "HTC Vive";
+        if (Settings.vrEnabled)
+        {
+            GameObject rig = GameObject.Find("[CameraRig]");
+            controller = rig.transform.Find("Controller (right)").GetComponent<SteamVR_TrackedController>();
+        }
     }
 
     // Use this for initialization
     void Start () {
-		
+        Cursor.visible = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (controller.triggerPressed)
+        if (Settings.vrEnabled)
         {
-            if (!triggerDown)
+            if (controller.triggerPressed)
             {
-                triggerDown = true;
-                eventManager.Emit(MenuEvent.TRIGGER_CLICKED);
+                if (!triggerDown)
+                {
+                    triggerDown = true;
+                    eventManager.Emit(MenuEvent.SECONDARY_CLICKED);
+                }
             }
-        } else
-        {
-            if (triggerDown)
+            else
             {
-                triggerDown = false;
+                if (triggerDown)
+                {
+                    triggerDown = false;
+                }
             }
         }
 	}

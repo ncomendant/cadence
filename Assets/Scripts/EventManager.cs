@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EventManager {
+public class EventManager : MonoBehaviour {
 
     private Dictionary<string, List<EventHandler>> handlers = new Dictionary<string, List<EventHandler>>();
 

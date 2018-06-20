@@ -8,7 +8,7 @@ public class DifficultyButton : MonoBehaviour {
     public bool selected = false;
 
     private bool hovered = false;
-    private Menu menu;
+    private EventManager eventManager;
 
 	// Use this for initialization
 	void Start () {
@@ -22,9 +22,9 @@ public class DifficultyButton : MonoBehaviour {
             textMesh.color = Color.gray;
         }
 
-        menu = GameObject.Find("Main").GetComponent<Menu>();
-        menu.On(MenuEvent.TRIGGER_CLICKED, new TriggerClickedHandler(this, textMesh));
-        menu.On(MenuEvent.DIFFICULTY_SET, new DifficultySetHandler(textMesh));
+        eventManager = GameObject.Find("Main").GetComponent<EventManager>();
+        eventManager.On(MenuEvent.PRIMARY_CLICKED, new TriggerClickedHandler(this, textMesh));
+        eventManager.On(MenuEvent.DIFFICULTY_SET, new DifficultySetHandler(textMesh));
 	}
 
     private void OnTriggerEnter(Collider other)
@@ -65,11 +65,23 @@ public class DifficultyButton : MonoBehaviour {
 
         public void OnEvent(params object[] data)
         {
-            if (difficultyButton.hovered)
+            if (Settings.vrEnabled)
             {
-                difficultyButton.menu.Emit(MenuEvent.DIFFICULTY_SET);
-                Settings.difficulty = difficultyButton.difficulty;
-                textMesh.color = Color.yellow;
+                if (difficultyButton.hovered)
+                {
+                    difficultyButton.eventManager.Emit(MenuEvent.DIFFICULTY_SET);
+                    Settings.difficulty = difficultyButton.difficulty;
+                    textMesh.color = Color.yellow;
+                }
+            } else
+            {
+                GameObject hoveredObject = (GameObject)data[0];
+                if (hoveredObject == this.difficultyButton.gameObject)
+                {
+                    difficultyButton.eventManager.Emit(MenuEvent.DIFFICULTY_SET);
+                    Settings.difficulty = difficultyButton.difficulty;
+                    textMesh.color = Color.yellow;
+                }
             }
         }
     }
