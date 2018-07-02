@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class DifficultyButton : MonoBehaviour {
 
@@ -65,7 +66,7 @@ public class DifficultyButton : MonoBehaviour {
 
         public void OnEvent(params object[] data)
         {
-            if (Settings.vrEnabled)
+            if (XRSettings.enabled)
             {
                 if (difficultyButton.hovered)
                 {

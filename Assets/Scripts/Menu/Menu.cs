@@ -7,6 +7,7 @@ public class Menu : MonoBehaviour {
 
     private SteamVR_TrackedController controller;
     private bool triggerDown = false;
+    public bool vrEnabled = false;
 
     private EventManager eventManager;
 
@@ -14,29 +15,31 @@ public class Menu : MonoBehaviour {
     {
         eventManager = GetComponent<EventManager>();
 
-        Settings.vrEnabled = XRDevice.isPresent && XRDevice.model == "HTC Vive";
-        if (Settings.vrEnabled)
+        XRSettings.enabled = XRDevice.isPresent && (XRDevice.model == "HTC Vive" || XRDevice.model == "Vive MV") && vrEnabled;
+        if (XRSettings.enabled)
         {
+            GameObject.Find("FPS Character").SetActive(false);
             GameObject rig = GameObject.Find("[CameraRig]");
             controller = rig.transform.Find("Controller (right)").GetComponent<SteamVR_TrackedController>();
+        } else
+        {
+            GameObject.Find("Menu VR Character").SetActive(false);
         }
     }
 
-    // Use this for initialization
     void Start () {
         Cursor.visible = false;
 	}
 	
-	// Update is called once per frame
 	void Update () {
-        if (Settings.vrEnabled)
+        if (XRSettings.enabled)
         {
             if (controller.triggerPressed)
             {
                 if (!triggerDown)
                 {
                     triggerDown = true;
-                    eventManager.Emit(MenuEvent.SECONDARY_CLICKED);
+                    eventManager.Emit(MenuEvent.PRIMARY_CLICKED);
                 }
             }
             else

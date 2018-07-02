@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.XR;
 
 public class PlayButton : MonoBehaviour {
 
@@ -41,7 +42,7 @@ public class PlayButton : MonoBehaviour {
 
         public void OnEvent(params object[] data)
         {
-            if (Settings.vrEnabled)
+            if (XRSettings.enabled)
             {
                 if (playButton.selected)
                 {
