@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR;
 
 public class Menu : MonoBehaviour {
@@ -39,7 +37,7 @@ public class Menu : MonoBehaviour {
                 if (!triggerDown)
                 {
                     triggerDown = true;
-                    eventManager.Emit(MenuEvent.PRIMARY_CLICKED);
+                    eventManager.Emit(ClickEvent.PRIMARY);
                 }
             }
             else

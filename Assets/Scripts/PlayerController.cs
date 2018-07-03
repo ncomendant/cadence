@@ -1,16 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.XR;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
     public float mouseSensitivity = 5.0f;
+
     private Camera playerCamera;
     private Transform crosshair;
-
     private GameObject hoveredObject;
-
     private EventManager eventManager;
 
 	// Use this for initialization
@@ -33,8 +29,6 @@ public class PlayerController : MonoBehaviour {
 
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward * 10f);
 
-        Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward);
-
         if (Physics.Raycast(ray, out hit))
         {
             hoveredObject = hit.collider.gameObject;
@@ -46,12 +40,12 @@ public class PlayerController : MonoBehaviour {
 
         if (hoveredObject != null && Input.GetMouseButtonDown(0))
         {
-            eventManager.Emit(MenuEvent.PRIMARY_CLICKED, hoveredObject);
+            eventManager.Emit(ClickEvent.PRIMARY, hoveredObject);
         }
 
         if (hoveredObject != null && Input.GetMouseButtonDown(1))
         {
-            eventManager.Emit(MenuEvent.SECONDARY_CLICKED, hoveredObject);
+            eventManager.Emit(ClickEvent.SECONDARY, hoveredObject);
         }
     }
 }

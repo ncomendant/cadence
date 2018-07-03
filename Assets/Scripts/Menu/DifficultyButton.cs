@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.XR;
 
 public class DifficultyButton : MonoBehaviour {
@@ -24,7 +22,7 @@ public class DifficultyButton : MonoBehaviour {
         }
 
         eventManager = GameObject.Find("Main").GetComponent<EventManager>();
-        eventManager.On(MenuEvent.PRIMARY_CLICKED, new TriggerClickedHandler(this, textMesh));
+        eventManager.On(ClickEvent.PRIMARY, new TriggerClickedHandler(this, textMesh));
         eventManager.On(MenuEvent.DIFFICULTY_SET, new DifficultySetHandler(textMesh));
 	}
 

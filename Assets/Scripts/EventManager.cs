@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class EventManager : MonoBehaviour {
@@ -21,10 +20,15 @@ public class EventManager : MonoBehaviour {
         if(handlers.ContainsKey(eventName))
         {
             List<EventHandler> list = handlers[eventName];
-            foreach (EventHandler handler in list)
+            for (int i = list.Count-1; i >= 0; i--)
             {
-                handler.OnEvent(data);
+                list[i].OnEvent(data);
             }
         }
+    }
+
+    public void Remove(string eventName, EventHandler handler)
+    {
+        handlers[eventName].Remove(handler);
     }
 }

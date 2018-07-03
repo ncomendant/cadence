@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
 
@@ -13,7 +11,7 @@ public class PlayButton : MonoBehaviour {
     // Use this for initialization
     void Start () {
         menu = GameObject.Find("Main").GetComponent<Menu>();
-        menu.On(MenuEvent.PRIMARY_CLICKED, new ClickedHandler(this));
+        menu.On(ClickEvent.PRIMARY, new ClickedHandler(this));
     }
 	
 	// Update is called once per frame
